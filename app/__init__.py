@@ -1,50 +1,34 @@
-#IMPORTS NATIVOS DE PYTHON.
-import os, sys
-import bcrypt
+# Archivo principal que ejecuta Flask
+# Carpetas de flask para que lo reconozcan como parte del ambiente necesitan tener un arhivo init.
+# Si llamás a APP y no establecémos el archivo que app está llamando, se hace la llamada al init.
+# Cuando se hace el flask run, flask hace una llamada de app donde se encutentra el init.
 
-#IMPORTS NATIVOS DEL FRAMEWORK
-from dotenv import load_dotenv
+import os
+
 from flask import Flask
-from flask_jwt_extended import JWTManager
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv # Vinculamos el .env para ingresar a la base de datos
 
-#IMPORTS PROPIOS
-# from app.models.models import (
-#     User,
-#     Pais,
-#     Provincia,
-#     Localidad,
-#     Persona
-# )
+app = Flask(__name__)
 
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(  
+    'PATH_DB'
+    ) # Indicamos base de datos, usando los datos almacenados en el .env
 
-app= Flask(__name__)
+db = SQLAlchemy(app) # Establecemos instancia con sqlalchemy e iniciamos la base de datos 
+migrate = Migrate(app, db) # flask db migrate (generar migración)
+ma = Marshmallow(app) # Instancia de marshmallow, recibe como parámetro app.
 
-#app.config['SQLALCHEY_DATABASE_URI'] = mysql+pymysql://usuario:contraseña@ip/nombre_db
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
-app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
+load_dotenv() # Cargo la variable del entorno (.env)
 
+# Vistas que ejecutará Flask
 
-db = SQLAlchemy(app) #recibe la app 
-migrate = Migrate(app, db) #recibe la app en si y donde va a instanciar el migrate.
-jwt = JWTManager(app)
-ma= Marshmallow(app)
+from app.views import views # Traemos todo lo que está dentro de la carpeta views, donde se importa models. 
 
-load_dotenv()
+# flask db init
 
-from app.views import view
+# flask db migrate -m 'create_user'
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0",port=5005)
-
-
-
-#Query para obtener datos de la persona
-
-#flask db migrate -m "creacion_de_pais"
-#flask db upgrade
-
-
-# ver marshmallow
+# flask db upgrade
