@@ -10,7 +10,4 @@ __pycache__/
 # Archivos de registro
 *.log
 
-# Archivo de entorno local
-.env
-
 .data/
