@@ -1,3 +1,4 @@
-CREATE DATABASE alchemy_b;
+/* CREATE DATABASE efi_PPI_DevOps_Quiroga_Venencia_Avendano; */
 
-USE alchemy_b;
+USE efi_PPI_DevOps_Quiroga_Venencia_Avendano;
+
