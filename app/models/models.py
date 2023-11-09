@@ -1,72 +1,73 @@
-from app import db
+from app import db # Importo de app.py donde ya está establecida la variable db
 from sqlalchemy import ForeignKey
 
-# CREACION TABLA USUARIO
-class User(db.Model):
-    __tablename__ = 'User'
-    id= db.Column(db.Integer, primary_key = True)
-    username = db.Column(db.String(100), unique= True, nullable= False)
-    password_hash = db.Column(db.String(300), unique = False, nullable= False)
-    is_admin = db.Column(db.Boolean, default=False)
+from datetime import datetime
 
-# CREACION TABLA PAIS
-class Pais(db.Model):
-    __tablename__ = 'pais'
+class User(db.Model): # Crear tabla
+    __tablename__ = 'user'
 
-    id = db.Column(db.Integer, primary_key=True)
-    nombre= db.Column(db.String(100), nullable=False)
+    id = db.Column(db.Integer, primary_key=True) # primary_key (hacer que el id sea autoincremental y única)
+    username = db.Column(db.String(50), unique=True, nullable=False) # Más columnas
+    first_name = db.Column(db.String(50), unique=False, nullable=False) # unique (no permite que se vuelva a repetir la misma información)
+    last_name = db.Column(db.String(50), unique=False, nullable=False)
+    post = db.relationship('Post')
+    comment = db.relationship('Comment')
 
-    def __str__(self):
-        return self.name
-
-# CREACION TABLA PROVINCIA
-class Provincia(db.Model):
-    __tablename__ = 'provincia'
+class Category(db.Model): 
+    __tablename__ = 'category'
 
     id = db.Column(db.Integer, primary_key=True)
-    nombre= db.Column(db.String(100), nullable=False)
-    pais= db.Column(
+    category = db.Column(db.String(200))
+    post = db.relationship('Post')
+
+class Post(db.Model): 
+    __tablename__ = 'post'
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(50))
+    content = db.Column(db.String(200))
+    fecha_creacion = db.Column(db.DateTime, nullable=False)
+    user = db.Column(
         db.Integer,
-        ForeignKey('pais.id'),
-        nullable= False
-    )
-    pais_obj = db.relationship('Pais')
+        ForeignKey('user.id'),
+        nullable=False,
+    ) # Columna que relaciona la tabla post con la tabla user
+    category = db.Column(
+        db.Integer,
+        ForeignKey('category.id'),
+        nullable=False,
+    )# Columna que relaciona la tabla post con la tabla category
+    user_obj = db.relationship('User') # Recibe la clase con la que se relacionará esta tabla
+    comment = db.relationship('Comment')
+    category_obj = db.relationship("Category")
     
-    def __str__(self):
-        return self.name
+class Comment(db.Model): 
+    __tablename__ = 'comment'
 
-# CREACION TABLA LOCALIDAD
-class Localidad(db.Model):
-    __tablename__ = 'localidad'
-
-    id= db.Column(db.Integer, primary_key=True)
-    nombre= db.Column(db.String(100), nullable=False)
-    provincia= db.Column(
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.String(200), nullable=False)
+    fecha_creacion = db.Column(db.DateTime, nullable=False)
+    post = db.Column(
         db.Integer,
-        ForeignKey('provincia.id'),
-        nullable= False
-    )
-    provincia_obj = db.relationship('Provincia')
+        ForeignKey('post.id'),
+        nullable=False,
+    ) # Columna que relaciona la tabla post con la tabla user
+    user = db.Column(
+        db.Integer,
+        ForeignKey('user.id'),
+        nullable=False,
+    ) # Columna que relaciona la tabla post con la tabla user
+    post_obj = db.relationship('Post')
+    user_obj = db.relationship('User')
 
-    def __str__(self):
-        return self.name
+    # username = fields.Method("get_username")
+    # first_name = fields.Method("get_first_name")    
 
-# CREACION TABLA PERSONA
-class Persona(db.Model):
-    __tablename__ = 'persona'
+    # def get_username(self, obj):
+    #     user = User.query.filter(id=obj.user).first
+    #     return user.username
+    
+    # def get_firt_name(self, obj):
+    #     user = User.query.filter_by(id=obj.user).first
+    #     return user.first_name
 
-    id= db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(50), nullable=False)
-    apellido = db.Column(db.String(50), nullable=False)
-    email= db.Column(db.String(100), nullable=False)
-    telefono= db.Column(db.Integer, nullable=False)
-    localidad= db.Column(db.Integer, 
-                        ForeignKey('localidad.id'),
-                        nullable=False
-                        )
-    domicilio= db.Column(db.String(100), nullable=False)
-    f_nacimiento= db.Column(db.Date, nullable=False)
-    activo= db.Column(db.Boolean, nullable=False, default=True)
-
-    def __str__(self):
-        return self.name
